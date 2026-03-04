@@ -38,7 +38,7 @@ export default function SignupPage() {
                 });
 
                 if (!result.error) {
-                    router.push(formData.role === "DOCTOR" ? "/doctor" : "/patient");
+                    router.push(formData.role === "DOCTOR" ? "/doctor" : "/user");
                     router.refresh();
                 } else {
                     alert("Signed up, but login failed. Please go to login page.");

@@ -1,40 +1,17 @@
+"use client";
 import Link from "next/link";
+import { useSession, signOut } from "next-auth/react";
 import SearchBar from "../components/features/SearchBar";
 import { LanguageToggle } from "../components/ui/LanguageToggle";
 import HealthConcernsLinks from "../components/features/HealthConcernsLinks";
 import SpecialtyLinks from "../components/features/SpecialtyLinks";
 
 export default function Home() {
+  const { data: session } = useSession();
+
   return (
     <div className="bg-white text-gray-900 font-sans">
-      {/* Header */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8" aria-label="Global">
-          <div className="flex items-center gap-8 lg:flex-1">
-            <a href="#" className="-m-1.5 p-1.5 flex items-center gap-2">
-              <span className="bg-blue-600 text-white rounded p-2 font-bold text-xl">NH</span>
-              <span className="text-2xl font-bold tracking-tight text-blue-900">Nuero Health</span>
-            </a>
 
-            <div className="hidden lg:flex lg:gap-x-6 text-sm font-semibold leading-6 text-gray-700">
-              <Link href="/patient" className="hover:text-blue-600">Find Doctors</Link>
-              <a href="#" className="hover:text-blue-600">Video Consult</a>
-              <a href="#" className="hover:text-blue-600">Medicines</a>
-              <Link href="/patient/labs" className="hover:text-blue-600">Lab Tests</Link>
-              <a href="#" className="hover:text-blue-600">Surgeries</a>
-            </div>
-          </div>
-
-          <div className="flex flex-1 justify-end items-center gap-4">
-            <Link href="/admin" className="hidden lg:block text-sm font-semibold border border-gray-300 rounded px-4 py-2 hover:bg-gray-50">
-              For Providers
-            </Link>
-            <Link href="/login" className="text-sm font-semibold rounded px-4 py-2 bg-white text-gray-700 border border-gray-300 hover:bg-gray-50">
-              Login / Signup
-            </Link>
-          </div>
-        </nav>
-      </header>
 
       <main>
         {/* Search Hero Section */}

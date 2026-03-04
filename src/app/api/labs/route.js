@@ -12,9 +12,6 @@ export async function GET(req) {
         let whereClause = {
             rating: {
                 gte: minRating
-            },
-            basePrice: {
-                lte: maxPrice
             }
         };
 
@@ -23,7 +20,14 @@ export async function GET(req) {
         }
 
         if (query) {
-            whereClause.labName = { contains: query };
+            whereClause.OR = [
+                { labName: { contains: query } },
+                { tests: { some: { testName: { contains: query }, price: { lte: maxPrice } } } }
+            ];
+        } else {
+            whereClause.basePrice = {
+                lte: maxPrice
+            };
         }
 
         const labs = await prisma.lab.findMany({
@@ -31,7 +35,10 @@ export async function GET(req) {
             include: {
                 user: {
                     select: { name: true, email: true }
-                }
+                },
+                tests: query ? {
+                    where: { testName: { contains: query } }
+                } : false
             },
             orderBy: {
                 rating: 'desc'

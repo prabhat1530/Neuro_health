@@ -71,6 +71,17 @@ model Lab {
   basePrice       Float    @default(500) // Example price for a standard test
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  tests           LabTest[]
+}
+
+model LabTest {
+  id        String   @id @default(uuid())
+  labId     String
+  lab       Lab      @relation(fields: [labId], references: [id], onDelete: Cascade)
+  testName  String
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Admin {

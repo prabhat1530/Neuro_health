@@ -6,6 +6,7 @@ async function main() {
     await prisma.review.deleteMany();
     await prisma.appointment.deleteMany();
     await prisma.doctor.deleteMany();
+    await prisma.labTest.deleteMany();
     await prisma.lab.deleteMany();
     await prisma.patient.deleteMany();
     await prisma.user.deleteMany();
@@ -80,7 +81,7 @@ async function main() {
                 }
             });
 
-            await prisma.lab.create({
+            const lab = await prisma.lab.create({
                 data: {
                     userId: user.id,
                     labName: labNameStr,
@@ -92,6 +93,26 @@ async function main() {
                     basePrice: Math.floor(Math.random() * 10) * 100 + 500,
                 }
             });
+
+            const testNames = [
+                "Complete Blood Count (CBC)", "Blood Sugar (Fasting)", "Blood Sugar (Postprandial / PP)",
+                "HbA1c (Glycated Hemoglobin)", "Lipid Profile", "Liver Function Test (LFT)",
+                "Kidney Function Test (KFT)", "Thyroid Stimulating Hormone (TSH)", "Vitamin D Test",
+                "Vitamin B12 Test", "Urine Routine Examination", "Urine Culture", "Stool Examination",
+                "Dengue Test", "Malaria Test", "Typhoid Test (Widal Test)", "COVID-19 RT-PCR Test",
+                "Rapid Antigen Test", "X-Ray Chest", "Ultrasound Abdomen", "CT Scan", "MRI Scan",
+                "ECG (Electrocardiogram)", "2D Echo (Echocardiography)", "C-Reactive Protein (CRP)",
+                "D-Dimer Test", "Prothrombin Time (PT/INR)", "Serum Calcium Test", "Serum Creatinine Test",
+                "Ferritin Test"
+            ];
+
+            const labTestsData = testNames.map(testName => ({
+                labId: lab.id,
+                testName,
+                price: Math.floor(Math.random() * 40 + 5) * 100 // 500 to 4500
+            }));
+
+            await prisma.labTest.createMany({ data: labTestsData });
 
             labIndex++;
         }

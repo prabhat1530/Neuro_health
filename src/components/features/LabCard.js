@@ -9,7 +9,12 @@ export default function LabCard({ lab }) {
 
     const hasAyushmanCard = !!session?.user?.ayushmanCardNumber;
     const discountRate = hasAyushmanCard ? 0.4 : 1;
-    const displayFee = (lab.basePrice * discountRate).toFixed(0);
+
+    const specificTest = lab.tests && lab.tests.length > 0 ? lab.tests[0] : null;
+    const displayPrice = specificTest ? specificTest.price : lab.basePrice;
+    const displayTestName = specificTest ? specificTest.testName : "Base Price";
+
+    const displayFee = (displayPrice * discountRate).toFixed(0);
 
     return (
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col h-full relative overflow-hidden">
@@ -39,16 +44,16 @@ export default function LabCard({ lab }) {
             </div>
 
             <div className="space-y-2 mb-4">
-                <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Base Price:</span>
-                    <span className="font-medium text-gray-900">
+                <div className="flex text-sm w-full">
+                    <span className="text-gray-500 w-1/3 pr-2 break-words">{displayTestName}:</span>
+                    <span className="font-medium text-gray-900 w-2/3 text-right">
                         {hasAyushmanCard ? (
                             <div className="flex flex-col items-end">
-                                <span className="line-through text-gray-400 text-xs">₹{lab.basePrice}</span>
+                                <span className="line-through text-gray-400 text-xs">₹{displayPrice}</span>
                                 <span className="text-green-600 font-bold">₹{displayFee} <span className="text-[10px] ml-1 px-1 bg-green-100 rounded-sm w-max">60% OFF</span></span>
                             </div>
                         ) : (
-                            <span>₹{lab.basePrice}</span>
+                            <span>₹{displayPrice}</span>
                         )}
                     </span>
                 </div>

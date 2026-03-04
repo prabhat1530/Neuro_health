@@ -2,6 +2,7 @@ import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "../components/ui/LanguageProvider";
 import { AuthProvider } from "../components/providers/AuthProvider";
+import Navbar from "../components/ui/Navbar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,6 +27,7 @@ export default function RootLayout({ children }) {
       <body className={`${inter.variable} ${outfit.variable}`}>
         <LanguageProvider>
           <AuthProvider>
+            <Navbar />
             {children}
           </AuthProvider>
         </LanguageProvider>
