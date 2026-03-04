@@ -1,26 +1,24 @@
 "use client";
 import { useState, useEffect } from "react";
-import DoctorCard from "../../../components/features/DoctorCard";
-import { useLanguage } from "../../../components/ui/LanguageProvider";
-import LanguageToggle from "../../../components/ui/LanguageToggle";
+import LabCard from "../../../../components/features/LabCard";
+import { useLanguage } from "../../../../components/ui/LanguageProvider";
+import LanguageToggle from "../../../../components/ui/LanguageToggle";
 
-export default function PatientDashboard() {
-    const [doctors, setDoctors] = useState([]);
-    const [specialty, setSpecialty] = useState("");
+export default function LabSearchPage() {
+    const [labs, setLabs] = useState([]);
+    const [query, setQuery] = useState("");
     const [location, setLocation] = useState("");
-    const [searchType, setSearchType] = useState("specialty"); // "specialty", "symptom", "doctor"
     const [minRating, setMinRating] = useState(0);
     const [maxPrice, setMaxPrice] = useState(2000);
     const [isLoading, setIsLoading] = useState(false);
     const { t } = useLanguage();
 
-    const fetchDoctors = async () => {
+    const fetchLabs = async () => {
         setIsLoading(true);
-        let url = "/api/doctors";
+        let url = "/api/labs";
         const params = new URLSearchParams();
-        if (specialty) params.append("query", specialty);
+        if (query) params.append("query", query);
         if (location) params.append("location", location);
-        if (searchType) params.append("type", searchType);
         if (minRating > 0) params.append("minRating", minRating);
         if (maxPrice < 2000) params.append("maxPrice", maxPrice);
         if (params.toString()) url += `?${params.toString()}`;
@@ -28,24 +26,24 @@ export default function PatientDashboard() {
         try {
             const res = await fetch(url);
             const data = await res.json();
-            if (data.success) {
-                setDoctors(data.data);
+            if (Array.isArray(data)) {
+                setLabs(data);
             }
         } catch (error) {
-            console.error("Failed to fetch doctors", error);
+            console.error("Failed to fetch labs", error);
         }
         setIsLoading(false);
     };
 
     useEffect(() => {
-        fetchDoctors();
+        fetchLabs();
     }, []);
 
     return (
         <div className="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
             <div className="max-w-7xl mx-auto">
                 <div className="flex justify-between items-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900">{t("find_doctor")}</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Find a Lab</h1>
                     <LanguageToggle />
                 </div>
 
@@ -72,58 +70,17 @@ export default function PatientDashboard() {
                         </datalist>
 
                         <div className="flex flex-1 rounded-md border border-gray-300 overflow-hidden bg-white">
-                            <select
-                                className="bg-gray-100 border-r border-gray-300 px-3 py-2 text-gray-700 outline-none focus:ring-blue-500 focus:border-blue-500"
-                                value={searchType}
-                                onChange={(e) => setSearchType(e.target.value)}
-                                title="Select search type"
-                            >
-                                <option value="specialty">Specialty</option>
-                                <option value="symptom">Symptom</option>
-                                <option value="doctor">Doctor</option>
-                            </select>
                             <input
                                 type="text"
-                                list="search-options"
-                                placeholder={`Search by ${searchType}...`}
+                                placeholder="Search by lab name..."
                                 className={`flex-1 py-2 px-4 outline-none transition-colors ${!location ? "bg-gray-100 cursor-not-allowed text-gray-400 placeholder-gray-400" : "bg-white text-gray-900"}`}
-                                value={specialty}
-                                onChange={(e) => setSpecialty(e.target.value)}
+                                value={query}
+                                onChange={(e) => setQuery(e.target.value)}
                                 disabled={!location}
                                 title={!location ? "Please select a location first" : ""}
                             />
                         </div>
 
-                        <datalist id="search-options">
-                            {searchType === "symptom" && (
-                                <>
-                                    <option value="stomach pain" />
-                                    <option value="chest pain" />
-                                    <option value="toothache" />
-                                    <option value="pregnancy" />
-                                    <option value="acne" />
-                                    <option value="fever" />
-                                    <option value="child fever" />
-                                    <option value="joint pain" />
-                                    <option value="depression" />
-                                </>
-                            )}
-                            {searchType === "specialty" && (
-                                <>
-                                    <option value="Cardiologist" />
-                                    <option value="Dentist" />
-                                    <option value="Dermatologist" />
-                                    <option value="General Physician" />
-                                    <option value="Gynecologist" />
-                                    <option value="Orthopedist" />
-                                    <option value="Pediatrician" />
-                                    <option value="Psychiatrist" />
-                                </>
-                            )}
-                            {searchType === "doctor" && (
-                                <option value="Type doctor's name..." />
-                            )}
-                        </datalist>
                         <button
                             onClick={() => {
                                 if (!location) {
@@ -131,7 +88,7 @@ export default function PatientDashboard() {
                                     document.getElementById("location-search-input")?.focus();
                                     return;
                                 }
-                                fetchDoctors();
+                                fetchLabs();
                             }}
                             className={`px-6 py-2 rounded-md font-medium text-white transition-colors ${!location ? "bg-blue-300 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`}
                         >
@@ -154,7 +111,7 @@ export default function PatientDashboard() {
                             </select>
                         </div>
                         <div className="flex items-center gap-3 flex-1 max-w-sm">
-                            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Max Fee: ₹{maxPrice === 2000 ? "Any" : maxPrice}</label>
+                            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">Max Base Price: ₹{maxPrice === 2000 ? "Any" : maxPrice}</label>
                             <input
                                 type="range"
                                 min="200"
@@ -168,17 +125,17 @@ export default function PatientDashboard() {
                     </div>
                 </div>
 
-                {/* Doctor List */}
+                {/* Lab List */}
                 {isLoading ? (
                     <p className="text-gray-500">{t("loading")}</p>
-                ) : doctors.length > 0 ? (
+                ) : labs.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {doctors.map(doctor => (
-                            <DoctorCard key={doctor.id} doctor={doctor} />
+                        {labs.map(lab => (
+                            <LabCard key={lab.id} lab={lab} />
                         ))}
                     </div>
                 ) : (
-                    <p className="text-gray-500">{t("no_doctors")}</p>
+                    <p className="text-gray-500">No labs found for this search.</p>
                 )}
             </div>
         </div>

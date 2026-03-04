@@ -3,31 +3,83 @@ import { prisma } from "../../../lib/prisma";
 
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
-    const specialty = searchParams.get("specialty");
+    const query = searchParams.get("query");
+    const type = searchParams.get("type");
     const location = searchParams.get("location");
     const city = searchParams.get("city");
+    const minRating = searchParams.get("minRating");
+    const maxPrice = searchParams.get("maxPrice");
 
     try {
-        const filters = { status: "VERIFIED" };
+        let filters = {};
 
-        if (specialty) {
-            filters.specialization = { contains: specialty }; // SQLite contains is case-sensitive or insensitive based on PRAGMA, usually simplified for MVP
-        }
+        const orConditions = [];
 
+        // Build case-insensitive location checks
         if (location) {
-            filters.location = { contains: location };
+            const locLower = location.toLowerCase();
+            const locTitle = location.charAt(0).toUpperCase() + location.substring(1).toLowerCase();
+            const locUpper = location.toUpperCase();
+
+            orConditions.push(
+                { city: { contains: locLower } },
+                { city: { contains: locTitle } },
+                { city: { contains: locUpper } }
+            );
         }
 
-        if (city) {
-            // Prioritize hyper-local searches
-            filters.city = { contains: city };
+        const andConditions = [];
+
+        if (orConditions.length > 0) {
+            andConditions.push({ OR: orConditions });
+        }
+
+        if (query) {
+            if (type === "symptom") {
+                const { getSpecialtiesForQuery } = require("../../../lib/symptomMapper");
+                const mappedSpecialties = getSpecialtiesForQuery(query);
+
+                if (mappedSpecialties.length > 0) {
+                    andConditions.push({
+                        OR: mappedSpecialties.map(spec => ({ specialization: { contains: spec } }))
+                    });
+                } else {
+                    // Symptom not found in map, attempt a fuzzy string search on specialization just in case
+                    andConditions.push({ specialization: { contains: query } });
+                }
+            } else if (type === "doctor") {
+                // Search by user name
+                const lower = query.toLowerCase();
+                const title = query.charAt(0).toUpperCase() + query.substring(1).toLowerCase();
+
+                andConditions.push({
+                    OR: [
+                        { user: { name: { contains: query } } },
+                        { user: { name: { contains: lower } } },
+                        { user: { name: { contains: title } } }
+                    ]
+                });
+            } else { // type === "specialty" or default
+                andConditions.push({ specialization: { contains: query } });
+            }
+        }
+
+        if (minRating) {
+            andConditions.push({ rating: { gte: parseFloat(minRating) } });
+        }
+
+        if (maxPrice) {
+            andConditions.push({ consultationFee: { lte: parseFloat(maxPrice) } });
+        }
+
+        if (andConditions.length > 0) {
+            filters.AND = andConditions;
         }
 
         const doctors = await prisma.doctor.findMany({
             where: filters,
             include: {
-                user: { select: { name: true, image: true } },
-                treatmentEstimates: true
+                user: { select: { name: true } }
             }
         });
 

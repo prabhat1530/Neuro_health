@@ -11,9 +11,9 @@ export async function POST(request) {
         }
 
         const body = await request.json();
-        const { doctorId, appointmentDate } = body;
+        const { doctorId, date, startTime, endTime } = body;
 
-        if (!doctorId || !appointmentDate) {
+        if (!doctorId || !date || !startTime || !endTime) {
             return NextResponse.json({ success: false, error: "Missing required fields" }, { status: 400 });
         }
 
@@ -30,8 +30,11 @@ export async function POST(request) {
             data: {
                 patientId: patient.id,
                 doctorId,
-                appointmentDate: new Date(appointmentDate),
-                status: "SCHEDULED",
+                date: new Date(date),
+                startTime,
+                endTime,
+                status: "PENDING",
+                paymentStatus: "UNPAID"
             }
         });
 

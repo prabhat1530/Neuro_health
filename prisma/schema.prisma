@@ -1,98 +1,121 @@
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  role          String    @default("USER") // USER, DOCTOR, ADMIN
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String?  // Optional for OAuth, required for credentials
+  name      String
+  role      String   @default("PATIENT") // PATIENT, DOCTOR, ADMIN
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  doctorProfile Doctor?
   patientProfile Patient?
-}
-
-model Doctor {
-  id                 String   @id @default(cuid())
-  userId             String   @unique
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  specialization     String
-  experienceYears    Int
-  consultationFee    Float
-  location           String
-  city               String   @default("Sonipat") // Core focus city
-  clinicImages       String?  // JSON string array of URLs
-  verificationLevel  String   @default("BASIC") // BASIC, FULL_CLINIC_VISIT
-  acceptsGovtSchemes Boolean  @default(false)
-  status             String   @default("PENDING") // PENDING, VERIFIED, REJECTED
-  mciRegNumber       String   @unique
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  appointments       Appointment[]
-  treatmentEstimates TreatmentEstimate[]
+  doctorProfile  Doctor?
+  labProfile     Lab?
+  adminProfile   Admin?
 }
 
 model Patient {
-  id               String   @id @default(cuid())
-  userId           String   @unique
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  age              Int?
-  gender           String?
-  bloodGroup       String?
-  govtSchemeId     String?  // Ayushman Bharat etc.
-  isSchemeVerified Boolean  @default(false)
-  preferredLanguage String  @default("en") // 'en' or 'hi'
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  appointments     Appointment[]
+  id                 String        @id @default(uuid())
+  userId             String        @unique
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  ayushmanCardNumber String?
+  appointments       Appointment[]
+  reviews            Review[]
 }
 
-model TreatmentEstimate {
-  id              String   @id @default(cuid())
-  doctorId        String
-  doctor          Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
-  procedureName   String
+model Doctor {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  specialization  String
+  experienceYears Int
   consultationFee Float
-  approxTestCost  Float?
-  approxMedCost   Float?
-  totalEstimate   Float
+  bio             String?
+  clinicName      String   @default("My Clinic")
+  clinicAddress   String   @default("")
+  city            String   @default("Sonipat")
+  state           String   @default("Haryana")
+  zipCode         String   @default("131001")
+  latitude        Float?
+  longitude       Float?
+  isVerified      Boolean  @default(false)
+  rating          Float    @default(0.0)
+  reviewCount     Int      @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+
+  appointments    Appointment[]
+  reviews         Review[]
+  availabilities  Availability[]
+}
+
+model Lab {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  labName         String
+  city            String   @default("Sonipat")
+  address         String   @default("")
+  rating          Float    @default(0.0)
+  reviewCount     Int      @default(0)
+  acceptsGovtSchemes Boolean @default(true)
+  basePrice       Float    @default(500) // Example price for a standard test
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Admin {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Appointment {
-  id              String   @id @default(cuid())
-  doctorId        String
-  doctor          Doctor   @relation(fields: [doctorId], references: [id])
-  patientId       String
-  patient         Patient  @relation(fields: [patientId], references: [id])
-  appointmentDate DateTime
-  status          String   @default("SCHEDULED") // SCHEDULED, COMPLETED, CANCELLED
-  paymentStatus   String   @default("PENDING") // PENDING, PAID, REFUNDED
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id            String            @id @default(uuid())
+  patientId     String
+  doctorId      String
+  patient       Patient           @relation(fields: [patientId], references: [id])
+  doctor        Doctor            @relation(fields: [doctorId], references: [id])
+  date          DateTime
+  startTime     String
+  endTime       String
+  status        String            @default("PENDING") // PENDING, CONFIRMED, COMPLETED, CANCELLED
+  paymentStatus String            @default("UNPAID")  // UNPAID, PAID, REFUNDED
+  paymentId     String?           
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
 
   review Review?
 }
 
+model Availability {
+  id        String   @id @default(uuid())
+  doctorId  String
+  doctor    Doctor   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+  dayOfWeek Int      // 0-6 (Sunday-Saturday)
+  startTime String   // e.g., "09:00"
+  endTime   String   // e.g., "17:00"
+}
+
 model Review {
-  id            String      @id @default(cuid())
+  id            String      @id @default(uuid())
+  patientId     String
+  doctorId      String
   appointmentId String      @unique
-  appointment   Appointment @relation(fields: [appointmentId], references: [id])
-  rating        Int
+  rating        Int         @default(5)
   comment       String?
   createdAt     DateTime    @default(now())
+
+  patient     Patient     @relation(fields: [patientId], references: [id])
+  doctor      Doctor      @relation(fields: [doctorId], references: [id])
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
 }

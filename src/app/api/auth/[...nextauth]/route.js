@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "../../../../lib/prisma";
 
 export const authOptions = {
+    secret: process.env.NEXTAUTH_SECRET,
     providers: [
         CredentialsProvider({
             name: "Credentials",
@@ -11,15 +12,22 @@ export const authOptions = {
                 password: { label: "Password", type: "password" }
             },
             async authorize(credentials) {
-                if (!credentials?.email) return null;
+                if (!credentials?.email || !credentials?.password) return null;
 
                 // Note: For MVP we skip password hashing, but in production ALWAYS hash
                 const user = await prisma.user.findUnique({
-                    where: { email: credentials.email }
+                    where: { email: credentials.email },
+                    include: { patientProfile: true }
                 });
 
-                if (user) {
-                    return { id: user.id, email: user.email, name: user.name, role: user.role };
+                if (user && user.password === credentials.password) {
+                    return {
+                        id: user.id,
+                        email: user.email,
+                        name: user.name,
+                        role: user.role,
+                        ayushmanCardNumber: user.patientProfile?.ayushmanCardNumber || null
+                    };
                 }
 
                 return null;
@@ -27,10 +35,14 @@ export const authOptions = {
         })
     ],
     callbacks: {
-        async jwt({ token, user }) {
+        async jwt({ token, user, trigger, session }) {
             if (user) {
                 token.role = user.role;
                 token.id = user.id;
+                token.ayushmanCardNumber = user.ayushmanCardNumber;
+            }
+            if (trigger === "update" && session?.ayushmanCardNumber) {
+                token.ayushmanCardNumber = session.ayushmanCardNumber;
             }
             return token;
         },
@@ -38,6 +50,7 @@ export const authOptions = {
             if (session.user) {
                 session.user.role = token.role;
                 session.user.id = token.id;
+                session.user.ayushmanCardNumber = token.ayushmanCardNumber;
             }
             return session;
         }

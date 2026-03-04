@@ -17,7 +17,7 @@ export default function LoginPage() {
         });
 
         if (result?.error) {
-            alert("Invalid credentials.");
+            alert("Login failed. Please check your email and password. If you don't have an account, please Sign Up first.");
         } else {
             router.push("/patient"); // Default route
             router.refresh();
@@ -43,6 +43,10 @@ export default function LoginPage() {
                     </div>
                     <div>
                         <button type="submit" className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">Sign in</button>
+                    </div>
+                    <div className="text-sm text-center">
+                        <span className="text-gray-500">Don't have an account? </span>
+                        <a href="/signup" className="font-semibold text-blue-600 hover:text-blue-500">Sign up</a>
                     </div>
                 </form>
             </div>

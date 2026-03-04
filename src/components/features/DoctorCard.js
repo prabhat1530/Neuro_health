@@ -2,18 +2,24 @@
 import BookingModal from "./BookingModal";
 import { useState } from "react";
 import { useLanguage } from "../ui/LanguageProvider";
+import { useSession } from "next-auth/react";
 
 export default function DoctorCard({ doctor }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const { t } = useLanguage();
+    const { data: session } = useSession();
+
+    const hasAyushmanCard = !!session?.user?.ayushmanCardNumber;
+    const discountRate = hasAyushmanCard ? 0.4 : 1;
+    const displayFee = (doctor.consultationFee * discountRate).toFixed(0);
 
     const primaryEstimate = doctor.treatmentEstimates?.[0];
 
     return (
         <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 flex flex-col h-full relative overflow-hidden">
-            {doctor.acceptsGovtSchemes && (
+            {hasAyushmanCard && (
                 <div className="absolute top-0 right-0 bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-bl-lg">
-                    {t("ayushman_eligible")}
+                    Ayushman Active (60% OFF)
                 </div>
             )}
 
@@ -33,6 +39,12 @@ export default function DoctorCard({ doctor }) {
                 </div>
             </div>
 
+            <div className="flex items-center gap-1 mb-4 pb-2 border-b border-gray-100">
+                <span className="text-yellow-400 text-lg">★</span>
+                <span className="font-bold text-gray-900">{doctor.rating?.toFixed(1) || "New"}</span>
+                <span className="text-gray-500 text-sm ml-1">({doctor.reviewCount || 0} reviews)</span>
+            </div>
+
             <div className="space-y-2 mb-4">
                 <div className="flex justify-between text-sm">
                     <span className="text-gray-500">{t("experience")}:</span>
@@ -40,7 +52,16 @@ export default function DoctorCard({ doctor }) {
                 </div>
                 <div className="flex justify-between text-sm">
                     <span className="text-gray-500">{t("consultation_fee")}:</span>
-                    <span className="font-medium text-gray-900">₹{doctor.consultationFee}</span>
+                    <span className="font-medium text-gray-900">
+                        {hasAyushmanCard ? (
+                            <div className="flex flex-col items-end">
+                                <span className="line-through text-gray-400 text-xs">₹{doctor.consultationFee}</span>
+                                <span className="text-green-600 font-bold">₹{displayFee} <span className="text-[10px] ml-1 px-1 bg-green-100 rounded-sm w-max">60% OFF</span></span>
+                            </div>
+                        ) : (
+                            <span>₹{doctor.consultationFee}</span>
+                        )}
+                    </span>
                 </div>
                 <div className="flex justify-between text-sm">
                     <span className="text-gray-500">{t("location")}:</span>
@@ -52,10 +73,20 @@ export default function DoctorCard({ doctor }) {
                 <div className="bg-gray-50 p-3 rounded-lg mb-4 text-sm">
                     <p className="font-semibold text-gray-700 mb-2">{t("treatment_estimate")} ({primaryEstimate.procedureName})</p>
                     <div className="space-y-1 text-gray-600">
-                        <div className="flex justify-between"><span>{t("consultation")}:</span> <span>₹{primaryEstimate.consultationFee}</span></div>
-                        <div className="flex justify-between"><span>{t("approx_tests")}:</span> <span>₹{primaryEstimate.approxTestCost || 0}</span></div>
-                        <div className="flex justify-between"><span>{t("approx_medicines")}:</span> <span>₹{primaryEstimate.approxMedCost || 0}</span></div>
-                        <div className="flex justify-between font-bold text-gray-800 mt-1 pt-1 border-t"><span>{t("total_approx")}:</span> <span>₹{primaryEstimate.totalEstimate}</span></div>
+                        <div className="flex justify-between"><span>{t("consultation")}:</span>
+                            <span>{hasAyushmanCard ? `₹${(primaryEstimate.consultationFee * 0.4).toFixed(0)}` : `₹${primaryEstimate.consultationFee}`}</span>
+                        </div>
+                        <div className="flex justify-between"><span>{t("approx_tests")}:</span>
+                            <span>{hasAyushmanCard ? `₹${(primaryEstimate.approxTestCost * 0.4).toFixed(0)}` : `₹${primaryEstimate.approxTestCost || 0}`}</span>
+                        </div>
+                        <div className="flex justify-between"><span>{t("approx_medicines")}:</span>
+                            <span>{hasAyushmanCard ? `₹${(primaryEstimate.approxMedCost * 0.4).toFixed(0)}` : `₹${primaryEstimate.approxMedCost || 0}`}</span>
+                        </div>
+                        <div className="flex justify-between font-bold text-gray-800 mt-1 pt-1 border-t"><span>{t("total_approx")}:</span>
+                            <span className={hasAyushmanCard ? "text-green-600" : ""}>
+                                {hasAyushmanCard ? `₹${(primaryEstimate.totalEstimate * 0.4).toFixed(0)}` : `₹${primaryEstimate.totalEstimate}`}
+                            </span>
+                        </div>
                     </div>
                 </div>
             )}

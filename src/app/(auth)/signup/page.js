@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 
 export default function SignupPage() {
     const router = useRouter();
@@ -9,6 +10,7 @@ export default function SignupPage() {
         email: "",
         password: "",
         role: "USER", // "USER" or "DOCTOR"
+        ayushmanCardNumber: "",
     });
 
     const handleChange = (e) => {
@@ -17,8 +19,37 @@ export default function SignupPage() {
 
     const handleSignup = async (e) => {
         e.preventDefault();
-        // In a real app we'd POST to an API route to create the user, then signIn
-        alert("Signup function needs API route implementation.");
+
+        try {
+            const res = await fetch("/api/auth/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await res.json();
+
+            if (res.ok) {
+                // Auto login after successful signup
+                const result = await signIn("credentials", {
+                    email: formData.email,
+                    password: formData.password,
+                    redirect: false,
+                });
+
+                if (!result.error) {
+                    router.push(formData.role === "DOCTOR" ? "/doctor" : "/patient");
+                    router.refresh();
+                } else {
+                    alert("Signed up, but login failed. Please go to login page.");
+                }
+            } else {
+                alert(data.error || "Signup failed");
+            }
+        } catch (error) {
+            console.error("Signup Error:", error);
+            alert("Something went wrong");
+        }
     };
 
     return (
@@ -48,9 +79,19 @@ export default function SignupPage() {
                                 <option value="DOCTOR">Doctor</option>
                             </select>
                         </div>
+                        {formData.role === "USER" && (
+                            <div>
+                                <label htmlFor="ayushmanCardNumber" className="sr-only">Ayushman Bharat Card Number (Optional)</label>
+                                <input id="ayushmanCardNumber" name="ayushmanCardNumber" type="text" className="relative block w-full rounded-md border-0 py-1.5 px-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" placeholder="Ayushman Bharat Card Number (Optional for 60% off)" value={formData.ayushmanCardNumber || ""} onChange={handleChange} />
+                            </div>
+                        )}
                     </div>
                     <div>
                         <button type="submit" className="flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">Sign up</button>
+                    </div>
+                    <div className="text-sm text-center">
+                        <span className="text-gray-500">Already have an account? </span>
+                        <a href="/login" className="font-semibold text-green-600 hover:text-green-500">Log in</a>
                     </div>
                 </form>
             </div>
