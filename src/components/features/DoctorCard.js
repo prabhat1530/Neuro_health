@@ -76,15 +76,12 @@ export default function DoctorCard({ doctor }) {
                         <div className="flex justify-between"><span>{t("consultation")}:</span>
                             <span>{hasAyushmanCard ? `₹${(primaryEstimate.consultationFee * 0.4).toFixed(0)}` : `₹${primaryEstimate.consultationFee}`}</span>
                         </div>
-                        <div className="flex justify-between"><span>{t("approx_tests")}:</span>
-                            <span>{hasAyushmanCard ? `₹${(primaryEstimate.approxTestCost * 0.4).toFixed(0)}` : `₹${primaryEstimate.approxTestCost || 0}`}</span>
-                        </div>
                         <div className="flex justify-between"><span>{t("approx_medicines")}:</span>
                             <span>{hasAyushmanCard ? `₹${(primaryEstimate.approxMedCost * 0.4).toFixed(0)}` : `₹${primaryEstimate.approxMedCost || 0}`}</span>
                         </div>
                         <div className="flex justify-between font-bold text-gray-800 mt-1 pt-1 border-t"><span>{t("total_approx")}:</span>
                             <span className={hasAyushmanCard ? "text-green-600" : ""}>
-                                {hasAyushmanCard ? `₹${(primaryEstimate.totalEstimate * 0.4).toFixed(0)}` : `₹${primaryEstimate.totalEstimate}`}
+                                {hasAyushmanCard ? `₹${((primaryEstimate.consultationFee + (primaryEstimate.approxMedCost || 0)) * 0.4).toFixed(0)}` : `₹${primaryEstimate.consultationFee + (primaryEstimate.approxMedCost || 0)}`}
                             </span>
                         </div>
                     </div>

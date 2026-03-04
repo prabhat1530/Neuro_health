@@ -19,7 +19,7 @@ export default function LoginPage() {
         if (result?.error) {
             alert("Login failed. Please check your email and password. If you don't have an account, please Sign Up first.");
         } else {
-            router.push("/user"); // Default route
+            router.push("/doctor"); // Default route
             router.refresh();
         }
     };

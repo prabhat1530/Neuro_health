@@ -15,11 +15,8 @@ export default function Navbar() {
                     </Link>
 
                     <div className="flex gap-x-6 text-sm font-semibold leading-6 text-gray-700">
-                        <Link href="/user" className="hover:text-blue-600">Find Doctors</Link>
-                        <a href="#" className="hover:text-blue-600 text-gray-400">Video Consult</a>
-                        <a href="#" className="hover:text-blue-600 text-gray-400">Medicines</a>
-                        <Link href="/user" className="hover:text-blue-600">Lab Tests</Link>
-                        <a href="#" className="hover:text-blue-600 text-gray-400">Surgeries</a>
+                        <Link href="/doctor" className="hover:text-blue-600">Find Doctors</Link>
+                        <Link href="/labs" className="hover:text-blue-600">Lab Tests</Link>
                     </div>
                 </div>
 

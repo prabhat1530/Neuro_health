@@ -6,9 +6,9 @@ export default withAuth(
         const token = req.nextauth.token;
         const path = req.nextUrl.pathname;
 
-        // Doctor specific routes
-        if (path.startsWith("/doctor") && token?.role !== "DOCTOR") {
-            return NextResponse.redirect(new URL("/user", req.url));
+        // Provider specific routes (Doctors only)
+        if (path.startsWith("/provider") && token?.role !== "DOCTOR") {
+            return NextResponse.redirect(new URL("/doctor", req.url));
         }
 
         // Admin specific routes
@@ -31,5 +31,6 @@ export const config = {
         "/doctor/:path*",
         "/admin/:path*",
         "/search/:path*",
+        "/labs/:path*",
     ],
 };
