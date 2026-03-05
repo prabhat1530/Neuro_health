@@ -47,12 +47,23 @@ export default withAuth(
             authorized: ({ token, req }) => {
                 const path = req.nextUrl.pathname;
 
-                // ONLY allow the homepage to be public
-                if (path === "/") {
+                // Paths that are accessible to everyone (Guests)
+                const PUBLIC_PATHS = [
+                    "/",          // Homepage
+                    "/doctor",    // Doctors list
+                    "/labs",      // Labs list
+                    "/caretakers",// Caretakers list
+                    "/equipment", // Equipment list
+                    "/signup",    // Signup page
+                    "/login",     // Login page
+                ];
+
+                // If path is public, let them in
+                if (PUBLIC_PATHS.some(p => path === p)) {
                     return true;
                 }
 
-                // require token for every other route (/doctor, /labs, etc.)
+                // For anything else (profile, doctor dashboard, booking, etc.), require login
                 return !!token;
             },
         },
