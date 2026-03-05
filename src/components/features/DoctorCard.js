@@ -30,6 +30,17 @@ export default function DoctorCard({ doctor }) {
                 <div>
                     <h3 className="text-lg font-bold text-gray-900">{doctor.user?.name || "Anonymous Doctor"}</h3>
                     <p className="text-sm text-blue-600 font-medium">{doctor.specialization}</p>
+                    {doctor.user?.email && (
+                        <a
+                            href={`mailto:${doctor.user.email}`}
+                            className="text-xs text-gray-400 hover:text-blue-500 flex items-center gap-1 mt-0.5 transition-colors"
+                        >
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                            {doctor.user.email}
+                        </a>
+                    )}
                     {doctor.verificationLevel === "FULL_CLINIC_VISIT" && (
                         <p className="text-xs text-green-600 font-medium flex items-center mt-1">
                             <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd"></path></svg>

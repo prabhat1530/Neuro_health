@@ -79,7 +79,7 @@ export async function GET(request) {
         const doctors = await prisma.doctor.findMany({
             where: filters,
             include: {
-                user: { select: { name: true } }
+                user: { select: { name: true, email: true } }
             }
         });
 

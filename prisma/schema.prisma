@@ -130,3 +130,46 @@ model Review {
   doctor      Doctor      @relation(fields: [doctorId], references: [id])
   appointment Appointment @relation(fields: [appointmentId], references: [id])
 }
+
+model Caretaker {
+  id              String   @id @default(uuid())
+  name            String
+  city            String
+  address         String   @default("")
+  specialization  String
+  experienceYears Int
+  hourlyRate      Float
+  dailyRate       Float
+  isVerified      Boolean  @default(false)
+  rating          Float    @default(0.0)
+  reviewCount     Int      @default(0)
+  acceptsGovtSchemes Boolean @default(true)
+  languages       String   @default("Hindi, English")
+  availability    String   @default("Full-time")
+  bio             String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model RentalEquipment {
+  id              String   @id @default(uuid())
+  vendorName      String
+  city            String
+  address         String   @default("")
+  equipmentName   String
+  category        String   // e.g. "Mobility", "Respiratory", "Hospital Beds", "Diagnostic"
+  description     String?
+  dailyRate       Float
+  weeklyRate      Float
+  monthlyRate     Float
+  depositAmount   Float    @default(0)
+  isAvailable     Boolean  @default(true)
+  isVerified      Boolean  @default(false)
+  rating          Float    @default(0.0)
+  reviewCount     Int      @default(0)
+  acceptsGovtSchemes Boolean @default(true)
+  imageUrl        String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
