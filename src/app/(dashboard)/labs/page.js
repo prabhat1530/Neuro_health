@@ -113,6 +113,9 @@ export default function LabsDashboard() {
                             <option value="MRI Scan" />
                             <option value="ECG (Electrocardiogram)" />
                             <option value="C-Reactive Protein (CRP)" />
+                            <option value="Prostate Specific Antigen (PSA)" />
+                            <option value="D-Dimer" />
+                            <option value="Biopsy" />
                         </datalist>
 
                         <button

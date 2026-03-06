@@ -2,14 +2,16 @@
 import { useState, useEffect } from "react";
 import EquipmentCard from "../../../components/features/EquipmentCard";
 
-const CATEGORIES = ["All", "Mobility", "Respiratory", "Hospital Beds", "Diagnostic"];
+const CATEGORIES = ["All", "Mobility", "Respiratory", "Hospital Beds", "Diagnostic", "Physiotherapy", "Oxygen"];
 
 const categoryIcons = {
     "All": "🏥",
     "Mobility": "🦽",
-    "Respiratory": "💨",
+    "Respiratory": "🌬️",
     "Hospital Beds": "🛏️",
     "Diagnostic": "🩺",
+    "Physiotherapy": "💪",
+    "Oxygen": "🧴",
 };
 
 export default function EquipmentDashboard() {

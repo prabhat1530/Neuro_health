@@ -53,17 +53,13 @@ function SignupForm() {
             const data = await res.json();
 
             if (res.ok) {
-                const result = await signIn("credentials", {
+                // Use standard signIn to established a persistent session
+                await signIn("credentials", {
                     email: formData.email,
                     password: formData.password,
-                    redirect: false,
+                    callbackUrl: isDoctor ? "/doctor/dashboard" : "/",
+                    redirect: true,
                 });
-                if (!result?.error) {
-                    router.push(isDoctor ? "/doctor/dashboard" : "/doctor");
-                    router.refresh();
-                } else {
-                    router.push("/login");
-                }
             } else {
                 setError(data.error || "Signup failed. Please try again.");
             }

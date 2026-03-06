@@ -110,7 +110,13 @@ export default function PatientDashboard() {
                                     <option value="fever" />
                                     <option value="child fever" />
                                     <option value="joint pain" />
+                                    <option value="headache" />
+                                    <option value="back pain" />
+                                    <option value="cough" />
+                                    <option value="vision problem" />
+                                    <option value="hair loss" />
                                     <option value="depression" />
+                                    <option value="anxiety" />
                                 </>
                             )}
                             {searchType === "specialty" && (
@@ -123,6 +129,14 @@ export default function PatientDashboard() {
                                     <option value="Orthopedist" />
                                     <option value="Pediatrician" />
                                     <option value="Psychiatrist" />
+                                    <option value="Neurologist" />
+                                    <option value="Ophthalmologist" />
+                                    <option value="ENT Specialist" />
+                                    <option value="Urologist" />
+                                    <option value="Gastroenterologist" />
+                                    <option value="Endocrinologist" />
+                                    <option value="Oncologist" />
+                                    <option value="Pulmonologist" />
                                 </>
                             )}
                             {searchType === "doctor" && (

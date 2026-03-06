@@ -8,8 +8,7 @@ const statusColors = {
     COMPLETED: "bg-blue-100 text-blue-700 border border-blue-300",
 };
 
-export default function AppointmentTable({ appointments: initial = [], onRefresh }) {
-    const [appointments, setAppointments] = useState(initial);
+export default function AppointmentTable({ appointments = [], onRefresh }) {
     const [loading, setLoading] = useState(null); // stores appointment id being acted on
 
     const handleAction = async (id, action) => {
@@ -22,9 +21,7 @@ export default function AppointmentTable({ appointments: initial = [], onRefresh
             });
             const data = await res.json();
             if (data.success) {
-                setAppointments(prev =>
-                    prev.map(a => a.id === id ? { ...a, status: action } : a)
-                );
+                if (onRefresh) onRefresh();
             } else {
                 alert(data.error || "Failed to update appointment.");
             }

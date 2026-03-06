@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import CaretakerCard from "../../../components/features/CaretakerCard";
 
-const SPECIALIZATIONS = ["All", "Elderly Care", "Post-Surgery Care", "Child Care", "Palliative Care", "Dementia Care"];
-const AVAILABILITIES = ["All", "Full-time", "Part-time", "On-call"];
+const SPECIALIZATIONS = ["All", "Elderly Care", "Post-Surgery Care", "Child Care", "Physiotherapy", "Nanny Services", "Dementia Care", "Paralysis Care"];
+const AVAILABILITIES = ["All", "Full-time", "Part-time", "On-call", "24/7 Live-in"];
 
 export default function CaretakersDashboard() {
     const [caretakers, setCaretakers] = useState([]);

@@ -27,7 +27,24 @@ export const symptomMap = {
     "knee pain": "Orthopedist",
     "depression": "Psychiatrist",
     "anxiety": "Psychiatrist",
-    "stress": "Psychiatrist"
+    "stress": "Psychiatrist",
+    "headache": "Neurologist",
+    "migraine": "Neurologist",
+    "dizziness": "Neurologist",
+    "eye pain": "Ophthalmologist",
+    "vision problem": "Ophthalmologist",
+    "blurry vision": "Ophthalmologist",
+    "ear pain": "ENT Specialist",
+    "hearing loss": "ENT Specialist",
+    "sore throat": "ENT Specialist",
+    "sinus": "ENT Specialist",
+    "diabetes": "Endocrinologist",
+    "thyroid": "Endocrinologist",
+    "gas": "Gastroenterologist",
+    "acidity": "Gastroenterologist",
+    "blood in stool": "Gastroenterologist",
+    "asthma": "Pulmonologist",
+    "breathing problem": "Pulmonologist"
 };
 
 export function getSpecialtiesForQuery(query) {
